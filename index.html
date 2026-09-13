@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Damage Order</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:linear-gradient(135deg,#e8faff,#fff);color:#17343c;min-height:100vh}
+button,input,textarea{font:inherit}.hidden{display:none!important}
+.wrap{max-width:1050px;margin:auto;padding:20px}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.brand{font-size:22px;font-weight:800;color:#20a8c6}.card{background:#fff;border:1px solid #d8f0f5;border-radius:20px;padding:22px;box-shadow:0 12px 35px #35aec31c}
+.auth{max-width:430px;margin:8vh auto}.tabs{display:flex;gap:8px;margin-bottom:18px}.tabs button,.ghost{border:0;background:#e9faff;color:#159ab7;padding:11px 15px;border-radius:10px;cursor:pointer}.tabs .active{background:#55c7dc;color:#fff}
+h1{margin:0 0 8px}.muted{color:#78949b;font-size:14px;line-height:1.5}label{display:block;font-size:14px;font-weight:700;margin:15px 0 7px}
+input,textarea{width:100%;padding:12px;border:1px solid #d5eaee;border-radius:11px;outline:0;background:#fbfeff}textarea{min-height:100px;resize:vertical}
+.primary{width:100%;border:0;background:#55c7dc;color:#fff;padding:13px;border-radius:11px;font-weight:700;cursor:pointer;margin-top:18px}.primary:hover{background:#38b8d0}
+.msg{margin-top:12px;padding:11px;border-radius:10px;font-size:14px}.ok{background:#e9fbf1;color:#147b49}.err{background:#fff0f0;color:#b13737}
+.grid{display:grid;grid-template-columns:1fr 1.3fr;gap:20px}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:18px 0}.stat{padding:15px;border-radius:14px;background:#f2fbfd}.stat b{display:block;font-size:22px;margin-top:5px}
+.order{border:1px solid #e1f0f3;border-radius:15px;padding:15px;margin-bottom:12px}.orderhead{display:flex;justify-content:space-between;gap:10px}.badge{padding:6px 9px;border-radius:20px;background:#e9faff;color:#159ab7;font-size:12px;font-weight:bold}.actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}.actions button{border:0;padding:8px 10px;border-radius:9px;cursor:pointer;background:#eef9fb;color:#167e95}.actions .danger{background:#fff0f0;color:#b13737}
+@media(max-width:750px){.grid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+
+<div id="authPage" class="wrap">
+  <div class="card auth">
+    <div class="brand">DAMAGE ORDER</div>
+    <h1>Đăng nhập</h1>
+    <p class="muted">Đăng nhập hoặc tạo tài khoản để sử dụng hệ thống.</p>
+    <div class="tabs">
+      <button id="loginTab" class="active" onclick="showAuth('login')">Đăng nhập</button>
+      <button id="registerTab" onclick="showAuth('register')">Tạo tài khoản</button>
+    </div>
+
+    <form id="loginForm">
+      <label>Tên tài khoản</label><input id="loginUser" required>
+      <label>Mật khẩu</label><input id="loginPass" type="password" required>
+      <button class="primary">Đăng nhập</button>
+    </form>
+
+    <form id="registerForm" class="hidden">
+      <label>Tên tài khoản</label><input id="regUser" required minlength="3">
+      <label>Mật khẩu</label><input id="regPass" type="password" required minlength="4">
+      <label>Nhập lại mật khẩu</label><input id="regPass2" type="password" required>
+      <button class="primary">Tạo tài khoản</button>
+    </form>
+    <div id="authMsg"></div>
+  </div>
+</div>
+
+<div id="customerPage" class="wrap hidden">
+  <div class="top"><div class="brand">DAMAGE ORDER</div><button class="ghost" onclick="logout()">Đăng xuất</button></div>
+  <div class="card">
+    <h1>Đặt đơn</h1><p class="muted">Nhập thông tin đơn hàng của bạn.</p>
+    <form id="orderForm">
+      <label>Tên / ID TikTok muốn Damage</label><input id="tiktok" required>
+      <label>Ghi chú</label><textarea id="note"></textarea>
+      <label>Email</label><input id="email" type="email" required>
+      <label>Key</label><input id="orderKey" required>
+      <button class="primary">Kiểm tra Key & Đặt đơn</button>
+    </form>
+    <div id="orderMsg"></div>
+  </div>
+</div>
+
+<div id="adminPage" class="wrap hidden">
+  <div class="top"><div class="brand">DAMAGE ADMIN</div><button class="ghost" onclick="logout()">Đăng xuất</button></div>
+  <div class="stats">
+    <div class="stat">Tổng đơn<b id="sAll">0</b></div>
+    <div class="stat">Đang xử lý<b id="sProcess">0</b></div>
+    <div class="stat">Đang chạy<b id="sRun">0</b></div>
+    <div class="stat">Đã hủy<b id="sCancel">0</b></div>
+  </div>
+  <div class="card">
+    <h1>Quản lý đơn</h1><p class="muted">Bạn có thể cập nhật trạng thái từng đơn.</p>
+    <div id="orders"></div>
+  </div>
+</div>
+
+<script>
+/*
+  DEMO GITHUB PAGES:
+  Dữ liệu được lưu bằng localStorage trên trình duyệt.
+  Không nên dùng bản này để lưu dữ liệu thật vì GitHub Pages không có
+  database và thông tin quản trị phía client có thể bị xem.
+*/
+
+const ADMIN_USER = "ADBAODUY";
+const ADMIN_PASS = "19112012";
+
+const VALID_KEYS = [
+  "DAMAGE-001",
+  "DAMAGE-002"
+];
+
+const $=id=>document.getElementById(id);
+const usersKey="damage_users";
+const ordersKey="damage_orders";
+let users=JSON.parse(localStorage.getItem(usersKey)||"{}");
+let orders=JSON.parse(localStorage.getItem(ordersKey)||"[]");
+
+function save(){localStorage.setItem(usersKey,JSON.stringify(users));localStorage.setItem(ordersKey,JSON.stringify(orders))}
+function showAuth(mode){
+  $("loginForm").classList.toggle("hidden",mode!=="login");
+  $("registerForm").classList.toggle("hidden",mode!=="register");
+  $("loginTab").classList.toggle("active",mode==="login");
+  $("registerTab").classList.toggle("active",mode==="register");
+  $("authMsg").innerHTML="";
+}
+function msg(el,text,type){$(el).innerHTML='<div class="msg '+type+'">'+text+'</div>'}
+
+$("registerForm").onsubmit=e=>{
+  e.preventDefault();
+  const u=$("regUser").value.trim(),p=$("regPass").value,p2=$("regPass2").value;
+  if(u.toUpperCase()===ADMIN_USER){msg("authMsg","Tên tài khoản này không thể đăng ký.","err");return}
+  if(p!==p2){msg("authMsg","Hai mật khẩu không giống nhau.","err");return}
+  if(users[u]){msg("authMsg","Tài khoản đã tồn tại.","err");return}
+  users[u]=p;save();msg("authMsg","Tạo tài khoản thành công! Hãy đăng nhập.","ok");$("registerForm").reset();showAuth("login");
+};
+$("loginForm").onsubmit=e=>{
+  e.preventDefault();
+  const u=$("loginUser").value.trim(),p=$("loginPass").value;
+  if(u===ADMIN_USER && p===ADMIN_PASS){sessionStorage.setItem("role","admin");openPage("admin");return}
+  if(users[u] && users[u]===p){sessionStorage.setItem("role","customer");sessionStorage.setItem("user",u);openPage("customer");return}
+  msg("authMsg","Sai tài khoản hoặc mật khẩu.","err");
+};
+
+$("orderForm").onsubmit=e=>{
+  e.preventDefault();
+  const key=$("orderKey").value.trim();
+  if(!VALID_KEYS.includes(key)){msg("orderMsg","❌ Key không đúng.","err");return}
+  const order={
+    id:"DMG-"+Date.now().toString().slice(-8),
+    user:sessionStorage.getItem("user")||"guest",
+    tiktok:$("tiktok").value.trim(),
+    note:$("note").value.trim(),
+    email:$("email").value.trim(),
+    status:"Đang xử lý",
+    created:new Date().toLocaleString("vi-VN")
+  };
+  orders.unshift(order);save();$("orderForm").reset();
+  msg("orderMsg","✅ Đặt đơn thành công! Trạng thái: Đang xử lý.","ok");
+};
+
+function setStatus(id,status){
+  const o=orders.find(x=>x.id===id);if(!o)return;
+  o.status=status;o.updated=new Date().toLocaleString("vi-VN");save();renderAdmin();
+}
+function deleteOrder(id){
+  if(!confirm("Xóa đơn này?"))return;
+  orders=orders.filter(x=>x.id!==id);save();renderAdmin();
+}
+function renderAdmin(){
+  $("sAll").textContent=orders.length;
+  $("sProcess").textContent=orders.filter(x=>x.status==="Đang xử lý").length;
+  $("sRun").textContent=orders.filter(x=>x.status==="Đang chạy").length;
+  $("sCancel").textContent=orders.filter(x=>x.status==="Đã hủy").length;
+  $("orders").innerHTML=orders.length?orders.map(o=>`
+    <div class="order">
+      <div class="orderhead"><b>${esc(o.id)}</b><span class="badge">${esc(o.status)}</span></div>
+      <p><b>TikTok:</b> ${esc(o.tiktok)}</p>
+      <p><b>Email:</b> ${esc(o.email)}</p>
+      <p><b>Ghi chú:</b> ${esc(o.note||"Không có")}</p>
+      <small>Ngày đặt: ${esc(o.created)}${o.updated?" · Cập nhật: "+esc(o.updated):""}</small>
+      <div class="actions">
+        <button onclick="setStatus('${o.id}','Đang xử lý')">Đang xử lý</button>
+        <button onclick="setStatus('${o.id}','Đang chạy')">Đang chạy</button>
+        <button onclick="setStatus('${o.id}','Đã hủy')" class="danger">Đã hủy</button>
+        <button onclick="setStatus('${o.id}','Hoàn thành')">Hoàn thành</button>
+        <button onclick="deleteOrder('${o.id}')" class="danger">Xóa</button>
+      </div>
+    </div>`).join(""):"<p class='muted'>Chưa có đơn nào.</p>";
+}
+function openPage(page){
+  $("authPage").classList.add("hidden");$("customerPage").classList.add("hidden");$("adminPage").classList.add("hidden");
+  $(page+"Page").classList.remove("hidden");if(page==="admin")renderAdmin();
+}
+function logout(){sessionStorage.clear();$("customerPage").classList.add("hidden");$("adminPage").classList.add("hidden");$("authPage").classList.remove("hidden")}
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
+</script>
+</body>
+  </html>
