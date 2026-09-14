@@ -119,7 +119,8 @@ input,textarea{width:100%;padding:12px;border:1px solid #d5eaee;border-radius:11
     <div id="keysBody" class="collapse-body hidden">
       <label>Tiền tố Key</label><input id="newKeyPrefix" placeholder="Ví dụ: BDT_ hoặc Key-">
       <label>Số lượng Key</label><input id="keyAmount" type="number" min="1" max="500" value="10">
-      <label>Số lượt dùng mỗi Key</label><input id="keyUses" type="number" min="5" max="10" value="10">
+      <label>Số lượt dùng mỗi Key</label>
+      <input id="keyUses" type="number" min="1" value="10">
       <button class="primary" onclick="generateKeys()">⚡ Tạo Key</button>
       <div class="key-count">Tổng Key: <b id="keyCount">0</b></div><div id="keyList"></div>
     </div>
