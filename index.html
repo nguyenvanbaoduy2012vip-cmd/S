@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Damage Order</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:linear-gradient(135deg,#e8faff,#fff);color:#17343c;min-height:100vh}
+button,input,textarea{font:inherit}.hidden{display:none!important}
+.wrap{max-width:1050px;margin:auto;padding:20px}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.brand{font-size:22px;font-weight:800;color:#20a8c6}.card{background:#fff;border:1px solid #d8f0f5;border-radius:20px;padding:22px;box-shadow:0 12px 35px #35aec31c}
+.auth{max-width:430px;margin:8vh auto}.tabs{display:flex;gap:8px;margin-bottom:18px}.tabs button,.ghost{border:0;background:#e9faff;color:#159ab7;padding:11px 15px;border-radius:10px;cursor:pointer}.tabs .active{background:#55c7dc;color:#fff}
+h1{margin:0 0 8px}.muted{color:#78949b;font-size:14px;line-height:1.5}label{display:block;font-size:14px;font-weight:700;margin:15px 0 7px}
+input,textarea{width:100%;padding:12px;border:1px solid #d5eaee;border-radius:11px;outline:0;background:#fbfeff}textarea{min-height:100px;resize:vertical}
+.primary{width:100%;border:0;background:#55c7dc;color:#fff;padding:13px;border-radius:11px;font-weight:700;cursor:pointer;margin-top:18px}.primary:hover{background:#38b8d0}
+.msg{margin-top:12px;padding:11px;border-radius:10px;font-size:14px}.ok{background:#e9fbf1;color:#147b49}.err{background:#fff0f0;color:#b13737}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:18px 0}.stat{padding:15px;border-radius:14px;background:#f2fbfd}.stat b{display:block;font-size:22px;margin-top:5px}
+.order{border:1px solid #e1f0f3;border-radius:15px;padding:15px;margin-bottom:12px}.orderhead{display:flex;justify-content:space-between;gap:10px}.badge{padding:6px 9px;border-radius:20px;background:#e9faff;color:#159ab7;font-size:12px;font-weight:bold}.actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}.actions button{border:0;padding:8px 10px;border-radius:9px;cursor:pointer;background:#eef9fb;color:#167e95}.actions .danger{background:#fff0f0;color:#b13737}
+.key-row{display:flex;gap:8px;margin-top:12px}.key-row input{flex:1}.key-row button{width:auto;margin-top:0}.key-item{display:flex;justify-content:space-between;align-items:center;border:1px solid #e1f0f3;border-radius:12px;padding:11px;margin-top:8px}.key-code{font-weight:700}.key-off{opacity:.55}.key-count{margin-top:12px;font-size:14px;color:#78949b}
+@media(max-width:750px){.stats{grid-template-columns:repeat(2,1fr)}.key-row{flex-direction:column}.key-row button{width:100%}}
+.toast{position:fixed;top:24px;left:50%;z-index:9999;transform:translate(-50%,-140%);width:min(430px,calc(100% - 30px));display:flex;align-items:center;gap:13px;padding:15px 16px;background:rgba(255,255,255,.97);border:1px solid #cceef4;border-radius:17px;box-shadow:0 18px 50px rgba(32,145,170,.20);transition:transform .42s cubic-bezier(.2,.8,.2,1),opacity .3s;opacity:0;backdrop-filter:blur(10px)}
+.toast.show{transform:translate(-50%,0);opacity:1}.toast-icon{width:40px;height:40px;min-width:40px;border-radius:50%;background:#dff9eb;color:#18a568;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:20px}.toast.error .toast-icon{background:#ffe6e6;color:#d44343}.toast-title{font-weight:800;font-size:15px;margin-bottom:3px}.toast-text{font-size:14px;color:#58757c;line-height:1.4}.toast-order{font-size:12px;color:#20a8c6;margin-top:3px;font-weight:700}.toast-close{margin-left:auto;border:0;background:transparent;color:#8ca3a8;font-size:22px;cursor:pointer}
+</style>
+</head>
+<body>
+
+<div id="authPage" class="wrap">
+<div class="card auth">
+<div class="brand">DAMAGE ORDER</div>
+<h1>Đăng nhập</h1>
+<p class="muted">Tài khoản được lưu trên Supabase, nên bạn bè có thể dùng chung hệ thống.</p>
+<div class="tabs">
+<button id="loginTab" class="active" onclick="showAuth('login')">Đăng nhập</button>
+<button id="registerTab" onclick="showAuth('register')">Tạo tài khoản</button>
+</div>
+
+<form id="loginForm" autocomplete="on">
+<label>Email</label><input id="loginEmail" name="username" type="email" autocomplete="username" required>
+<label>Mật khẩu</label><input id="loginPass" name="password" type="password" autocomplete="current-password" required>
+<button class="primary">Đăng nhập</button>
+</form>
+
+<form id="registerForm" class="hidden" autocomplete="on">
+<label>Tên tài khoản</label><input id="regUser" name="new-username" type="text" autocomplete="username" required minlength="3">
+<label>Email</label><input id="regEmail" name="email" type="email" autocomplete="email" required>
+<label>Mật khẩu</label><input id="regPass" name="new-password" type="password" autocomplete="new-password" required minlength="6">
+<label>Nhập lại mật khẩu</label><input id="regPass2" name="confirm-password" type="password" autocomplete="new-password" required>
+<button class="primary">Tạo tài khoản</button>
+</form>
+<div id="authMsg"></div>
+</div>
+</div>
+
+<div id="toast" class="toast">
+<div class="toast-icon" id="toastIcon">✓</div><div>
+<div class="toast-title">Thông Báo!</div><div class="toast-text" id="toastText"></div><div class="toast-order" id="toastOrder"></div>
+</div><button class="toast-close" onclick="hideToast()">×</button>
+</div>
+
+<div id="customerPage" class="wrap hidden">
+<div class="top"><div class="brand">DAMAGE ORDER</div><button class="ghost" onclick="logout()">Đăng xuất</button></div>
+<div class="card">
+<h1>Đặt đơn</h1><p class="muted">Nhập thông tin đơn hàng của bạn.</p>
+<form id="orderForm">
+<label>Tên / ID TikTok muốn Damage</label><input id="tiktok" required>
+<label>Ghi chú</label><textarea id="note"></textarea>
+<label>Email</label><input id="email" type="email" required>
+<label>Key</label><input id="orderKey" required>
+<button class="primary">Kiểm tra Key & Đặt đơn</button>
+</form><div id="orderMsg"></div>
+</div>
+<div class="card" style="margin-top:20px">
+<h1>Lịch sử đơn</h1><p class="muted">Các đơn của tài khoản này trên mọi thiết bị.</p><div id="myOrders"></div>
+</div>
+</div>
+
+<div id="adminPage" class="wrap hidden">
+<div class="top"><div class="brand">DAMAGE ADMIN</div><button class="ghost" onclick="logout()">Đăng xuất</button></div>
+<div class="stats">
+<div class="stat">Tổng đơn<b id="sAll">0</b></div><div class="stat">Đang xử lý<b id="sProcess">0</b></div><div class="stat">Đang chạy<b id="sRun">0</b></div><div class="stat">Đã hủy<b id="sCancel">0</b></div>
+</div>
+<div class="card">
+<h1>Quản lý đơn</h1><p class="muted">Chỉ tài khoản Admin mới có quyền quản lý.</p><div id="orders"></div>
+</div>
+<div class="card" style="margin-top:20px">
+<h1>Quản lý Key</h1><p class="muted">Thêm Key mới hoặc bật/tắt Key. Key được kiểm tra trực tiếp trên database.</p>
+<div class="key-row"><input id="newKey" placeholder="Ví dụ: DAMAGE-003"><button class="primary" onclick="addKey()">＋ Thêm Key</button></div>
+<div class="key-count">Tổng Key: <b id="keyCount">0</b></div><div id="keyList"></div>
+</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL="https://tsuwgqfkqwoxrubpceip.supabase.co";
+const SUPABASE_KEY="sb_publishable_7p2EGGm7qGfPvPKojX_3iw_R905ki3R";
+const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const $=id=>document.getElementById(id);
+let currentUser=null,currentProfile=null,toastTimer;
+
+function showToast(text,orderId="",error=false){
+const t=$("toast");$("toastText").textContent=text;$("toastOrder").textContent=orderId?"Mã đơn: "+orderId:"";$("toastIcon").textContent=error?"!":"✓";t.classList.toggle("error",error);t.classList.add("show");clearTimeout(toastTimer);toastTimer=setTimeout(hideToast,4500)
+}
+function hideToast(){$("toast").classList.remove("show")}
+function showAuth(mode){
+$("loginForm").classList.toggle("hidden",mode!=="login");$("registerForm").classList.toggle("hidden",mode!=="register");
+$("loginTab").classList.toggle("active",mode==="login");$("registerTab").classList.toggle("active",mode==="register");$("authMsg").innerHTML=""
+}
+function msg(el,text,type){$(el).innerHTML='<div class="msg '+type+'">'+text+"</div>"}
+function openPage(page){
+$("authPage").classList.add("hidden");$("customerPage").classList.add("hidden");$("adminPage").classList.add("hidden");$(page+"Page").classList.remove("hidden");
+if(page==="customer")loadMyOrders();if(page==="admin"){renderAdmin();renderKeys()}
+}
+function displayId(id){return "DMG-"+String(id).slice(0,8).toUpperCase()}
+
+$("registerForm").onsubmit=async e=>{
+e.preventDefault();
+const u=$("regUser").value.trim(),email=$("regEmail").value.trim(),p=$("regPass").value,p2=$("regPass2").value;
+if(p!==p2){msg("authMsg","Hai mật khẩu không giống nhau.","err");return}
+if(!u||!email){msg("authMsg","Vui lòng nhập đủ thông tin.","err");return}
+const {data,error}=await db.auth.signUp({email,password:p,options:{data:{username:u}}});
+if(error){msg("authMsg",error.message,"err");return}
+$("registerForm").reset();
+msg("authMsg",data.session?"Tạo tài khoản thành công!":"Tạo tài khoản thành công. Hãy kiểm tra email để xác nhận tài khoản.","ok");
+if(data.session)showAuth("login");
+};
+
+$("loginForm").onsubmit=async e=>{
+e.preventDefault();
+const email=$("loginEmail").value.trim(),password=$("loginPass").value;
+const {error}=await db.auth.signInWithPassword({email,password});
+if(error){msg("authMsg","Sai email hoặc mật khẩu.","err");return}
+};
+
+$("orderForm").onsubmit=async e=>{
+e.preventDefault();
+if(!currentUser){msg("orderMsg","Bạn chưa đăng nhập.","err");return}
+const key=$("orderKey").value.trim().toUpperCase();
+const {data,error}=await db.rpc("submit_order",{
+p_tiktok:$("tiktok").value.trim(),
+p_note:$("note").value.trim(),
+p_email:$("email").value.trim(),
+p_key:key
+});
+if(error){
+const bad=error.message.includes("INVALID_KEY");
+msg("orderMsg",bad?"❌ Key không đúng.":"❌ Không thể đặt đơn: "+error.message,"err");
+showToast(bad?"Key không hợp lệ. Vui lòng kiểm tra lại.":"Không thể đặt đơn.","",true);return
+}
+const order=data;
+$("orderForm").reset();$("email").value=currentUser.email||"";
+msg("orderMsg","✅ Đặt đơn thành công! Trạng thái: Đang xử lý.","ok");
+showToast("Đã đặt đơn thành công!",displayId(order.id));loadMyOrders()
+};
+
+async function loadMyOrders(){
+if(!currentUser)return;
+const {data,error}=await db.from("orders").select("*").eq("user_id",currentUser.id).order("created_at",{ascending:false});
+if(error){$("myOrders").innerHTML="<p class='muted'>Không tải được đơn.</p>";return}
+$("myOrders").innerHTML=data.length?data.map(o=>`
+<div class="order"><div class="orderhead"><b>${esc(displayId(o.id))}</b><span class="badge">${esc(o.status)}</span></div>
+<p><b>TikTok:</b> ${esc(o.tiktok)}</p><small>Ngày đặt: ${esc(new Date(o.created_at).toLocaleString("vi-VN"))}</small></div>`).join(""):"<p class='muted'>Bạn chưa có đơn nào.</p>"
+}
+
+async function renderAdmin(){
+const {data,error}=await db.from("orders").select("*").order("created_at",{ascending:false});
+if(error){$("orders").innerHTML="<p class='muted'>Không tải được đơn.</p>";return}
+$("sAll").textContent=data.length;$("sProcess").textContent=data.filter(x=>x.status==="Đang xử lý").length;$("sRun").textContent=data.filter(x=>x.status==="Đang chạy").length;$("sCancel").textContent=data.filter(x=>x.status==="Đã hủy").length;
+$("orders").innerHTML=data.length?data.map(o=>`
+<div class="order"><div class="orderhead"><b>${esc(displayId(o.id))}</b><span class="badge">${esc(o.status)}</span></div>
+<p><b>TikTok:</b> ${esc(o.tiktok)}</p><p><b>Email:</b> ${esc(o.email)}</p><p><b>Ghi chú:</b> ${esc(o.note||"Không có")}</p>
+<small>Ngày đặt: ${esc(new Date(o.created_at).toLocaleString("vi-VN"))}</small>
+<div class="actions">
+<button onclick="setStatus('${o.id}','Đang xử lý')">Đang xử lý</button><button onclick="setStatus('${o.id}','Đang chạy')">Đang chạy</button>
+<button onclick="setStatus('${o.id}','Đã hủy')" class="danger">Đã hủy</button><button onclick="setStatus('${o.id}','Hoàn thành')">Hoàn thành</button>
+<button onclick="deleteOrder('${o.id}')" class="danger">Xóa</button></div></div>`).join(""):"<p class='muted'>Chưa có đơn nào.</p>"
+}
+
+async function setStatus(id,status){
+const {error}=await db.from("orders").update({status,updated_at:new Date().toISOString()}).eq("id",id);
+if(error){showToast("Không có quyền hoặc cập nhật thất bại.","",true);return}
+renderAdmin()
+}
+async function deleteOrder(id){
+if(!confirm("Xóa đơn này?"))return;
+const {error}=await db.from("orders").delete().eq("id",id);
+if(error){showToast("Xóa thất bại.","",true);return}renderAdmin()
+}
+
+async function renderKeys(){
+const {data,error}=await db.from("keys").select("id,key,active").order("id");
+if(error){$("keyList").innerHTML="<p class='muted'>Không tải được Key.</p>";return}
+$("keyCount").textContent=data.length;
+$("keyList").innerHTML=data.length?data.map(k=>`
+<div class="key-item ${k.active?"":"key-off"}"><span class="key-code">🔑 ${esc(k.key)} ${k.active?"":"(Tắt)"}</span>
+<div class="actions"><button onclick="toggleKey(${k.id},${k.active})">${k.active?"Tắt":"Bật"}</button><button class="danger" onclick="deleteKey(${k.id})">Xóa</button></div></div>`).join(""):"<p class='muted'>Chưa có Key.</p>"
+}
+async function addKey(){
+let key=$("newKey").value.trim().toUpperCase();if(!key){showToast("Vui lòng nhập Key.","",true);return}
+const {error}=await db.from("keys").insert({key});
+if(error){showToast(error.code==="23505"?"Key đã tồn tại.":"Thêm Key thất bại.","",true);return}
+$("newKey").value="";renderKeys();showToast("Đã thêm Key!")
+}
+async function toggleKey(id,active){
+const {error}=await db.from("keys").update({active:!active}).eq("id",id);
+if(error){showToast("Không thể thay đổi Key.","",true);return}renderKeys()
+}
+async function deleteKey(id){
+if(!confirm("Xóa Key này? Nếu Key đã được dùng cho đơn cũ, Supabase có thể không cho xóa."))return;
+const {error}=await db.from("keys").delete().eq("id",id);
+if(error){showToast("Không thể xóa Key này. Hãy Tắt Key thay thế.","",true);return}
+renderKeys();showToast("Đã xóa Key.")
+}
+$("newKey").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();addKey()}});
+
+async function initUser(user){
+currentUser=user;
+const {data,error}=await db.from("profiles").select("username,role").eq("id",user.id).single();
+if(error){showAuth("login");msg("authMsg","Không đọc được hồ sơ tài khoản.","err");return}
+currentProfile=data;
+$("email").value=user.email||"";
+openPage(data.role==="admin"?"admin":"customer")
+}
+async function logout(){await db.auth.signOut();currentUser=null;currentProfile=null;openAuth()}
+function openAuth(){$("customerPage").classList.add("hidden");$("adminPage").classList.add("hidden");$("authPage").classList.remove("hidden");showAuth("login")}
+
+db.auth.onAuthStateChange((event,session)=>{setTimeout(()=>{if(session)initUser(session.user);else openAuth()},0)});
+db.auth.getSession().then(({data})=>{if(data.session)initUser(data.session.user)});
+
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
+</script>
+</body>
+</html>
