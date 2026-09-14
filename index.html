@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Damage Order</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:linear-gradient(135deg,#e8faff,#fff);color:#17343c;min-height:100vh}
+button,input,textarea{font:inherit}.hidden{display:none!important}
+.wrap{max-width:1050px;margin:auto;padding:20px}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.brand{font-size:22px;font-weight:800;color:#20a8c6}.card{background:#fff;border:1px solid #d8f0f5;border-radius:20px;padding:22px;box-shadow:0 12px 35px #35aec31c}
+.auth{max-width:430px;margin:8vh auto}.tabs{display:flex;gap:8px;margin-bottom:18px}.tabs button,.ghost{border:0;background:#e9faff;color:#159ab7;padding:11px 15px;border-radius:10px;cursor:pointer}.tabs .active{background:#55c7dc;color:#fff}
+h1{margin:0 0 8px}.muted{color:#78949b;font-size:14px;line-height:1.5}label{display:block;font-size:14px;font-weight:700;margin:15px 0 7px}
+input,textarea{width:100%;padding:12px;border:1px solid #d5eaee;border-radius:11px;outline:0;background:#fbfeff}textarea{min-height:100px;resize:vertical}
+.primary{width:100%;border:0;background:#55c7dc;color:#fff;padding:13px;border-radius:11px;font-weight:700;cursor:pointer;margin-top:18px}.primary:hover{background:#38b8d0}
+.msg{margin-top:12px;padding:11px;border-radius:10px;font-size:14px}.ok{background:#e9fbf1;color:#147b49}.err{background:#fff0f0;color:#b13737}
+.grid{display:grid;grid-template-columns:1fr 1.3fr;gap:20px}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:18px 0}.stat{padding:15px;border-radius:14px;background:#f2fbfd}.stat b{display:block;font-size:22px;margin-top:5px}
+.order{border:1px solid #e1f0f3;border-radius:15px;padding:15px;margin-bottom:12px}.orderhead{display:flex;justify-content:space-between;gap:10px}.badge{padding:6px 9px;border-radius:20px;background:#e9faff;color:#159ab7;font-size:12px;font-weight:bold}.actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}.actions button{border:0;padding:8px 10px;border-radius:9px;cursor:pointer;background:#eef9fb;color:#167e95}.actions .danger{background:#fff0f0;color:#b13737}.key-row{display:flex;gap:8px;margin-top:12px}.key-row input{flex:1}.key-row button{width:auto;margin-top:0}.key-item{display:flex;justify-content:space-between;align-items:center;border:1px solid #e1f0f3;border-radius:12px;padding:11px;margin-top:8px;gap:10px}.key-code{font-weight:700}.key-off{opacity:.55}.key-count{margin-top:12px;font-size:14px;color:#78949b}
+.search-row{display:flex;gap:8px;margin:12px 0}.search-row input{flex:1}.search-row button{width:auto;margin-top:0;padding:12px 15px}
+.collapse-head{display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer;padding:2px 0}.collapse-head button{border:0;background:#e9faff;color:#159ab7;border-radius:9px;padding:8px 11px;cursor:pointer;font-weight:700}.collapse-body{margin-top:15px}
+.admin-note{margin-top:10px;padding:10px 12px;background:#fffaf0;border:1px solid #f4e4b9;border-radius:10px;color:#795d20;font-size:14px;line-height:1.45}.admin-note b{color:#6a5016}
+.saved-key{display:flex;align-items:center;justify-content:space-between;gap:8px;border:1px solid #e1f0f3;border-radius:12px;padding:10px 12px;margin-top:8px}.saved-key code{font-weight:700;color:#167e95;word-break:break-all}.saved-key button{border:0;background:#fff0f0;color:#b13737;padding:7px 10px;border-radius:8px;cursor:pointer}
+.ban-box{border:1px solid #f0dada;background:#fffafa;border-radius:14px;padding:15px;margin-top:20px}.ban-row{display:grid;grid-template-columns:1.5fr 1fr auto;gap:8px;align-items:end}.ban-row button{width:auto;margin-top:0}.user-result{border:1px solid #e1f0f3;border-radius:12px;padding:12px;margin-top:10px}.user-result .actions{margin-top:8px}
+@media(max-width:750px){.grid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}.key-row,.search-row{flex-direction:column}.key-row button,.search-row button{width:100%}.ban-row{grid-template-columns:1fr}.ban-row button{width:100%}}
+.toast{position:fixed;top:24px;left:50%;z-index:9999;transform:translate(-50%,-140%);width:min(430px,calc(100% - 30px));display:flex;align-items:center;gap:13px;padding:15px 16px;background:rgba(255,255,255,.97);border:1px solid #cceef4;border-radius:17px;box-shadow:0 18px 50px rgba(32,145,170,.20);transition:transform .42s cubic-bezier(.2,.8,.2,1),opacity .3s;opacity:0;backdrop-filter:blur(10px)}
+.toast.show{transform:translate(-50%,0);opacity:1}.toast-icon{width:40px;height:40px;min-width:40px;border-radius:50%;background:#dff9eb;color:#18a568;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:20px}.toast.error .toast-icon{background:#ffe6e6;color:#d44343}.toast-title{font-weight:800;font-size:15px;margin-bottom:3px}.toast-text{font-size:14px;color:#58757c;line-height:1.4}.toast-order{font-size:12px;color:#20a8c6;margin-top:3px;font-weight:700}.toast-close{margin-left:auto;border:0;background:transparent;color:#8ca3a8;font-size:22px;cursor:pointer}
+.site-closed{position:sticky;top:0;z-index:5000;display:flex;align-items:center;gap:12px;padding:13px 18px;background:#fff3f3;border-bottom:1px solid #ffd0d0;color:#a32929;box-shadow:0 5px 18px rgba(100,30,30,.08)}.site-closed b{display:block;margin-bottom:3px}.site-closed div:last-child{font-size:13px;line-height:1.45}.closed-icon{width:34px;height:34px;border-radius:10px;background:#ffe1e1;display:flex;align-items:center;justify-content:center;font-weight:900;flex:none}.close-panel{border:1px solid #f0dada;background:#fffafa}.switch-row{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:12px 0}.switch{position:relative;width:52px;height:29px;display:inline-block}.switch input{opacity:0;width:0;height:0}.slider{position:absolute;inset:0;background:#c9dadd;border-radius:30px;cursor:pointer;transition:.2s}.slider:before{content:"";position:absolute;width:23px;height:23px;left:3px;top:3px;background:white;border-radius:50%;transition:.2s;box-shadow:0 2px 5px #0002}.switch input:checked+.slider{background:#e05a5a}.switch input:checked+.slider:before{transform:translateX(23px)}.collapse-head{display:flex;justify-content:space-between;align-items:center;gap:12px;cursor:pointer}.collapse-head>button{flex:none;border:0;background:#e9faff;color:#159ab7;padding:9px 12px;border-radius:10px;cursor:pointer}.collapse-body{margin-top:14px}.ban-note{min-height:75px}
+</style>
+</head>
+<body>
+<div id="siteClosedBanner" class="site-closed hidden">
+  <div class="closed-icon">⏸</div>
+  <div><b>Website đang tạm đóng</b><div id="siteClosedMessage">WEBSITE HIỆN TẠI ĐANG TẠM ĐÓNG VÌ QUÁ TẢI NGƯỜI DÙNG VÀ ĐẶT ĐƠN QUÁ NHIỀU</div></div>
+</div>
+
+<div id="authPage" class="wrap">
+  <div class="card auth">
+    <div class="brand">DAMAGE ORDER</div><h1>Đăng nhập</h1>
+    <p class="muted">Đăng nhập hoặc tạo tài khoản để sử dụng hệ thống.</p>
+    <div class="tabs"><button id="loginTab" class="active" onclick="showAuth('login')">Đăng nhập</button><button id="registerTab" onclick="showAuth('register')">Tạo tài khoản</button></div>
+    <form id="loginForm" autocomplete="on">
+      <label>Email</label><input id="loginEmail" name="username" type="email" autocomplete="username" required>
+      <label>Mật khẩu</label><input id="loginPass" name="password" type="password" autocomplete="current-password" required>
+      <button class="primary">Đăng nhập</button>
+    </form>
+    <form id="registerForm" class="hidden" autocomplete="on">
+      <label>Tên tài khoản</label><input id="regUser" name="new-username" type="text" autocomplete="username" required minlength="3">
+      <label>Email</label><input id="regEmail" name="email" type="email" autocomplete="email" required>
+      <label>Mật khẩu</label><input id="regPass" name="new-password" type="password" autocomplete="new-password" required minlength="6">
+      <label>Nhập lại mật khẩu</label><input id="regPass2" name="confirm-password" type="password" autocomplete="new-password" required>
+      <button class="primary">Tạo tài khoản</button>
+    </form>
+    <div id="authMsg"></div>
+  </div>
+</div>
+
+<div id="toast" class="toast"><div class="toast-icon" id="toastIcon">✓</div><div><div class="toast-title">Thông Báo!</div><div class="toast-text" id="toastText"></div><div class="toast-order" id="toastOrder"></div></div><button class="toast-close" onclick="hideToast()">×</button></div>
+
+<div id="customerPage" class="wrap hidden">
+  <div class="top"><div class="brand">DAMAGE ORDER</div><button class="ghost" onclick="logout()">Đăng xuất</button></div>
+  <div class="card">
+    <h1>Đặt đơn</h1><p class="muted">Nhập thông tin đơn hàng của bạn.</p>
+    <form id="orderForm">
+      <label>Tên / ID TikTok muốn Damage</label><input id="tiktok" required>
+      <label>Ghi chú</label><textarea id="note"></textarea>
+      <label>Email</label><input id="email" type="email" required>
+      <label>Key</label>
+      <input id="orderKey" required placeholder="Nhập Key hoặc chọn Key đã lưu">
+      <div class="key-row"><button type="button" class="ghost" onclick="loadSavedKeys()">🔑 Xem Key đã lưu</button><button type="button" class="ghost" onclick="saveCurrentKey()">＋ Lưu Key này</button></div>
+      <div id="savedKeys" class="hidden"></div>
+      <button class="primary">Kiểm tra Key & Đặt đơn</button>
+    </form>
+    <div id="orderMsg"></div>
+  </div>
+
+  <div class="card" style="margin-top:20px">
+    <h1>Lịch sử đơn</h1><p class="muted">Các đơn của tài khoản này trên mọi thiết bị.</p>
+    <div class="search-row"><input id="userOrderSearch" placeholder="🔎 Tìm theo ID đơn..."><button class="ghost" type="button" onclick="searchUserOrders()">Tìm</button></div>
+    <div id="myOrders"></div>
+  </div>
+</div>
+
+<div id="adminPage" class="wrap hidden">
+  <div class="top"><div class="brand">DAMAGE ADMIN</div><button class="ghost" onclick="logout()">Đăng xuất</button></div>
+  <div class="stats"><div class="stat">Tổng đơn<b id="sAll">0</b></div><div class="stat">Đang xử lý<b id="sProcess">0</b></div><div class="stat">Đang chạy<b id="sRun">0</b></div><div class="stat">Đã hủy<b id="sCancel">0</b></div></div>
+
+  <div class="card close-panel">
+    <div class="collapse-head" onclick="toggleClosePanel()"><div><h1 style="margin:0">⏸ Đóng / Mở Website</h1><p class="muted" style="margin:5px 0 0">Admin có thể đóng website khi quá tải. User sẽ thấy thông báo ngay.</p></div><button type="button" id="closePanelToggle">Thu gọn ▲</button></div>
+    <div id="closePanelBody" class="collapse-body">
+      <div class="switch-row"><div><b id="siteStatusText">Đang kiểm tra...</b><div class="muted">Khi đóng: không cho đăng ký mới và không cho đặt đơn. Admin vẫn đăng nhập được.</div></div><label class="switch"><input id="siteClosedToggle" type="checkbox" onchange="setSiteClosed(this.checked)"><span class="slider"></span></label></div>
+      <label>Nội dung thông báo khi đóng</label><textarea id="siteClosedInput" rows="3" placeholder="WEBSITE HIỆN TẠI ĐANG TẠM ĐÓNG VÌ QUÁ TẢI NGƯỜI DÙNG VÀ ĐẶT ĐƠN QUÁ NHIỀU"></textarea>
+      <button class="primary" type="button" onclick="saveSiteMessage()">💾 Lưu thông báo</button>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:20px">
+    <div class="collapse-head" onclick="toggleOrders()"><div><h1 style="margin:0">📦 Lịch sử / Quản lý đơn</h1><p class="muted" style="margin:5px 0 0">Danh sách đơn toàn bộ User. Có tìm kiếm và ghi chú Admin.</p></div><button type="button" id="ordersToggle">Mở rộng ▼</button></div>
+    <div id="adminOrdersBody" class="collapse-body hidden">
+      <div class="search-row"><input id="adminOrderSearch" placeholder="🔎 Tìm đơn theo ID..."><button class="ghost" type="button" onclick="searchAdminOrders()">Tìm</button></div>
+      <div id="orders"></div>
+    </div>
+  </div>
+
+  <div class="card ban-box">
+    <h1>🚫 Quản lý User</h1>
+    <p class="muted">Ban theo email. Nhập <b>7 ngày</b>, <b>1 tháng</b>, <b>1 giờ 5 phút</b>... và thêm ghi chú cho lần khóa.</p>
+    <div class="ban-row">
+      <div><label>Email User</label><input id="banEmail" type="email" placeholder="user@gmail.com"></div>
+      <div><label>Thời gian khóa</label><input id="banDuration" placeholder="Ví dụ: 7 ngày, 1 tháng, 1 giờ 5 phút"></div>
+      <button class="primary" type="button" onclick="banUser()">🚫 Ban User</button>
+    </div>
+    <label>📝 Ghi chú Ban</label><textarea id="banNote" class="ban-note" placeholder="Ví dụ: Spam đơn quá nhiều / Vi phạm quy định..."></textarea>
+    <div class="actions"><button type="button" onclick="setBanDuration('7 ngày')">7 ngày</button><button type="button" onclick="setBanDuration('1 tháng')">1 tháng</button><button type="button" onclick="setBanDuration('1 năm')">1 năm</button><button type="button" onclick="unbanUser()" class="danger">♻️ Unban</button></div>
+    <div id="banResult"></div>
+  </div>
+
+  <div class="card" style="margin-top:20px">
+    <div class="collapse-head" onclick="toggleKeys()"><div><h1 style="margin:0">🔑 Quản lý Key</h1><p class="muted" style="margin:5px 0 0">Tạo và quản lý Key. Vẫn dùng max_uses / used_count hiện tại.</p></div><button type="button" id="keysToggle">Mở rộng ▼</button></div>
+    <div id="keysBody" class="collapse-body hidden">
+      <label>Tiền tố Key</label><input id="newKeyPrefix" placeholder="Ví dụ: BDT_ hoặc Key-">
+      <label>Số lượng Key</label><input id="keyAmount" type="number" min="1" max="500" value="10">
+      <label>Số lượt dùng mỗi Key</label><input id="keyUses" type="number" min="5" max="10" value="10">
+      <button class="primary" onclick="generateKeys()">⚡ Tạo Key</button>
+      <div class="key-count">Tổng Key: <b id="keyCount">0</b></div><div id="keyList"></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:20px">
+    <div class="collapse-head" onclick="toggleKeyHistory()"><div><h1 style="margin:0">🗑️ Lịch sử Key đã xóa</h1><p class="muted" style="margin:5px 0 0">Key bị xóa thủ công hoặc tự động hết lượt.</p></div><button type="button" id="keyHistoryToggle">Mở rộng ▼</button></div>
+    <div id="keyHistoryBody" class="collapse-body hidden">
+      <div class="search-row"><input id="keyHistorySearch" placeholder="🔎 Tìm Key, email, thiết bị..."><button class="ghost" type="button" onclick="renderKeyHistory()">Tìm</button></div>
+      <div id="keyHistory"></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL="https://tsuwgqfkqwoxrubpceip.supabase.co";
+const SUPABASE_KEY="sb_publishable_7p2EGGm7qGfPvPKojX_3iw_R905ki3R";
+const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const $=id=>document.getElementById(id);
+let currentUser=null,currentProfile=null,toastTimer,adminOrdersCache=[],userOrdersCache=[],adminOrdersCollapsed=true,keysCollapsed=true,closePanelCollapsed=false,siteClosed=false,siteMessage="WEBSITE HIỆN TẠI ĐANG TẠM ĐÓNG VÌ QUÁ TẢI NGƯỜI DÙNG VÀ ĐẶT ĐƠN QUÁ NHIỀU";
+
+function showToast(text,orderId="",error=false){const t=$("toast");$("toastText").textContent=text;$("toastOrder").textContent=orderId?"Mã đơn: "+orderId:"";$("toastIcon").textContent=error?"!":"✓";t.classList.toggle("error",error);t.classList.add("show");clearTimeout(toastTimer);toastTimer=setTimeout(hideToast,4500)}
+function hideToast(){$("toast").classList.remove("show")}
+function showAuth(mode){$("loginForm").classList.toggle("hidden",mode!=="login");$("registerForm").classList.toggle("hidden",mode!=="register");$("loginTab").classList.toggle("active",mode==="login");$("registerTab").classList.toggle("active",mode==="register");$("authMsg").innerHTML=""}
+function msg(el,text,type){$(el).innerHTML='<div class="msg '+type+'">'+text+"</div>"}
+function displayId(id){return "DMG-"+String(id).slice(0,8).toUpperCase()}
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
+function openPage(page){$("authPage").classList.add("hidden");$("customerPage").classList.add("hidden");$("adminPage").classList.add("hidden");$(page+"Page").classList.remove("hidden");if(page==="customer")loadMyOrders();if(page==="admin"){renderAdmin();renderKeys();renderKeyHistory();loadSiteSettings()}}
+function setBanDuration(v){$("banDuration").value=v}
+
+$("registerForm").onsubmit=async e=>{e.preventDefault();if(siteClosed){msg("authMsg","⏸ Website đang tạm đóng. Không thể đăng ký lúc này.","err");return}const u=$("regUser").value.trim(),email=$("regEmail").value.trim(),p=$("regPass").value,p2=$("regPass2").value;if(p!==p2){msg("authMsg","Hai mật khẩu không giống nhau.","err");return}if(!u||!email){msg("authMsg","Vui lòng nhập đủ thông tin.","err");return}const {data,error}=await db.auth.signUp({email,password:p,options:{data:{username:u}}});if(error){msg("authMsg",error.message,"err");return}$("registerForm").reset();msg("authMsg",data.session?"Tạo tài khoản thành công!":"Tạo tài khoản thành công. Hãy kiểm tra email để xác nhận tài khoản.","ok");if(data.session)showAuth("login")};
+$("loginForm").onsubmit=async e=>{e.preventDefault();const email=$("loginEmail").value.trim(),password=$("loginPass").value;const {error}=await db.auth.signInWithPassword({email,password});if(error){msg("authMsg","Sai email hoặc mật khẩu.","err");return}};
+
+$("orderForm").onsubmit=async e=>{
+e.preventDefault();if(siteClosed){msg("orderMsg","⏸ Website hiện đang tạm đóng vì quá tải. Vui lòng quay lại sau.","err");return}if(!currentUser){msg("orderMsg","Bạn chưa đăng nhập.","err");return}
+const key=$("orderKey").value.trim().toUpperCase();
+const {data,error}=await db.rpc("submit_order",{p_tiktok:$("tiktok").value.trim(),p_note:$("note").value.trim(),p_email:$("email").value.trim(),p_key:key});
+if(error){const bad=error.message.includes("INVALID_KEY");const banned=error.message.includes("USER_BANNED");msg("orderMsg",banned?"🚫 Tài khoản đang bị khóa.":bad?"❌ Key không đúng hoặc Key đã hết lượt.":"❌ Không thể đặt đơn: "+error.message,"err");showToast(banned?"Tài khoản đang bị khóa.":bad?"Key không hợp lệ hoặc đã hết lượt.":"Không thể đặt đơn.","",true);return}
+const order=Array.isArray(data)?data[0]:data;$("orderForm").reset();$("email").value=currentUser.email||"";msg("orderMsg","✅ Đặt đơn thành công! Trạng thái: Đang xử lý.","ok");showToast("Đã đặt đơn thành công!",displayId(order.id));loadMyOrders()
+};
+
+function orderMatchesSearch(o,q){if(!q)return true;q=q.trim().toUpperCase().replace(/^DMG-/,"");return String(o.id).toUpperCase().startsWith(q)||displayId(o.id).toUpperCase().includes(q)}
+function renderUserOrders(data){const q=$("userOrderSearch").value,filtered=data.filter(o=>orderMatchesSearch(o,q));$("myOrders").innerHTML=filtered.length?filtered.map(o=>`<div class="order"><div class="orderhead"><b>${esc(displayId(o.id))}</b><span class="badge">${esc(o.status)}</span></div><p><b>TikTok:</b> ${esc(o.tiktok)}</p>${o.admin_note?`<div class="admin-note"><b>📝 Ghi chú Admin:</b><br>${esc(o.admin_note)}</div>`:""}<small>Ngày đặt: ${esc(new Date(o.created_at).toLocaleString("vi-VN"))}</small></div>`).join(""):`<p class='muted'>${q?"Không tìm thấy đơn với ID này.":"Bạn chưa có đơn nào."}</p>`}
+async function loadMyOrders(){if(!currentUser)return;const {data,error}=await db.from("orders").select("*").eq("user_id",currentUser.id).order("created_at",{ascending:false});if(error){$("myOrders").innerHTML="<p class='muted'>Không tải được đơn.</p>";return}userOrdersCache=data||[];renderUserOrders(userOrdersCache)}
+function searchUserOrders(){renderUserOrders(userOrdersCache)}
+
+async function renderAdmin(){const {data,error}=await db.from("orders").select("*").order("created_at",{ascending:false});if(error){$("orders").innerHTML="<p class='muted'>Không tải được đơn.</p>";return}adminOrdersCache=data||[];$("sAll").textContent=adminOrdersCache.length;$("sProcess").textContent=adminOrdersCache.filter(x=>x.status==="Đang xử lý").length;$("sRun").textContent=adminOrdersCache.filter(x=>x.status==="Đang chạy").length;$("sCancel").textContent=adminOrdersCache.filter(x=>x.status==="Đã hủy").length;renderAdminOrders(adminOrdersCache)}
+function renderAdminOrders(data){const q=$("adminOrderSearch").value,filtered=data.filter(o=>orderMatchesSearch(o,q));$("orders").innerHTML=filtered.length?filtered.map(o=>`<div class="order"><div class="orderhead"><b>${esc(displayId(o.id))}</b><span class="badge">${esc(o.status)}</span></div><p><b>TikTok:</b> ${esc(o.tiktok)}</p><p><b>Email:</b> ${esc(o.email)}</p><p><b>Ghi chú khách:</b> ${esc(o.note||"Không có")}</p><label>📝 Ghi chú Admin</label><textarea id="adminNote_${esc(o.id)}" rows="3" placeholder="Nhập ghi chú để User nhìn thấy...">${esc(o.admin_note||"")}</textarea><button type="button" class="ghost" style="margin-top:8px" onclick="saveAdminNote('${o.id}')">💾 Lưu ghi chú</button><small style="display:block;margin-top:10px">Ngày đặt: ${esc(new Date(o.created_at).toLocaleString("vi-VN"))}</small><div class="actions"><button onclick="setStatus('${o.id}','Đang xử lý')">Đang xử lý</button><button onclick="setStatus('${o.id}','Đang chạy')">Đang chạy</button><button onclick="setStatus('${o.id}','Đã hủy')" class="danger">Đã hủy</button><button onclick="setStatus('${o.id}','Hoàn thành')">Hoàn thành</button><button onclick="deleteOrder('${o.id}')" class="danger">Xóa</button></div></div>`).join(""):`<p class='muted'>${q?"Không tìm thấy đơn với ID này.":"Chưa có đơn nào."}</p>`}
+function searchAdminOrders(){renderAdminOrders(adminOrdersCache)}
+async function saveAdminNote(id){const box=$("adminNote_"+id);if(!box)return;const {error}=await db.from("orders").update({admin_note:box.value.trim()}).eq("id",id);if(error){showToast("Lưu ghi chú thất bại. Hãy kiểm tra cột admin_note.","",true);return}const found=adminOrdersCache.find(o=>o.id===id);if(found)found.admin_note=box.value.trim();showToast("Đã lưu ghi chú Admin!",displayId(id))}
+function toggleOrders(){adminOrdersCollapsed=!adminOrdersCollapsed;$("adminOrdersBody").classList.toggle("hidden",adminOrdersCollapsed);$("ordersToggle").textContent=adminOrdersCollapsed?"Mở rộng ▼":"Thu gọn ▲"}
+function toggleKeys(){keysCollapsed=!keysCollapsed;$("keysBody").classList.toggle("hidden",keysCollapsed);$("keysToggle").textContent=keysCollapsed?"Mở rộng ▼":"Thu gọn ▲"}
+function toggleClosePanel(){closePanelCollapsed=!closePanelCollapsed;$("closePanelBody").classList.toggle("hidden",closePanelCollapsed);$("closePanelToggle").textContent=closePanelCollapsed?"Mở rộng ▼":"Thu gọn ▲"}
+async function setStatus(id,status){const {error}=await db.from("orders").update({status,updated_at:new Date().toISOString()}).eq("id",id);if(error){showToast("Không có quyền hoặc cập nhật thất bại.","",true);return}showToast("Đã cập nhật trạng thái!",displayId(id));renderAdmin()}
+async function deleteOrder(id){if(!confirm("Xóa đơn này?"))return;const {error}=await db.from("orders").delete().eq("id",id);if(error){showToast("Xóa thất bại.","",true);return}showToast("Đã xóa đơn!",displayId(id));renderAdmin()}
+
+async function renderKeys(){const {data,error}=await db.from("keys").select("id,key,active,max_uses,used_count").order("id",{ascending:false});if(error){$("keyList").innerHTML="<p class='muted'>Không tải được Key. Hãy chạy SQL bổ sung.</p>";return}$("keyCount").textContent=data.length;$("keyList").innerHTML=data.length?data.map(k=>`<div class="key-item ${k.active?"":"key-off"}"><div><span class="key-code">🔑 ${esc(k.key)}</span><br><small>${k.used_count}/${k.max_uses} lượt ${k.active?"":"• Đã khóa"}</small></div><div class="actions"><button onclick="toggleKey(${k.id},${k.active},${k.used_count},${k.max_uses})">${k.active?"Tắt":"Bật"}</button><button class="danger" onclick="deleteKey(${k.id})">Xóa</button></div></div>`).join(""):"<p class='muted'>Chưa có Key.</p>"}
+function randomString(length){const chars="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";const array=new Uint32Array(length);crypto.getRandomValues(array);return [...array].map(n=>chars[n%chars.length]).join("")}
+async function generateKeys(){const prefix=$("newKeyPrefix").value.trim(),amount=parseInt($("keyAmount").value),uses=parseInt($("keyUses").value);if(!prefix){showToast("Vui lòng nhập tiền tố Key.","",true);return}if(!amount||amount<1||amount>500){showToast("Số lượng Key phải từ 1 đến 500.","",true);return}if(!uses||uses<5||uses>10){showToast("Số lượt dùng phải từ 5 đến 10.","",true);return}const rows=[],generated=new Set();for(let i=0;i<amount;i++){let key;do{key=prefix+randomString(8)}while(generated.has(key));generated.add(key);rows.push({key,max_uses:uses,used_count:0,active:true})}const {error}=await db.from("keys").insert(rows);if(error){showToast("Tạo Key thất bại: "+error.message,"",true);return}$("newKeyPrefix").value="";await renderKeys();showToast("Đã tạo "+amount+" Key thành công!")}
+async function toggleKey(id,active,used,max){if(!active&&used>=max){showToast("Key này đã hết lượt, không thể bật lại.","",true);return}const {error}=await db.from("keys").update({active:!active}).eq("id",id);if(error){showToast("Không thể thay đổi Key.","",true);return}renderKeys()}
+async function deleteKey(id){
+  if(!confirm("Xóa Key này? Key sẽ được lưu vào lịch sử xóa."))return;
+  const {data:key,error:readError}=await db.from("keys").select("id,key,active,max_uses,used_count").eq("id",id).single();
+  if(readError||!key){showToast("Không tìm thấy Key.","",true);return}
+  const historyRow={key:key.key,max_uses:key.max_uses,used_count:key.used_count,reason:"Admin xóa",deleted_by:currentUser?.email||null,device:getDeviceName(),user_agent:navigator.userAgent};
+  const {error:historyError}=await db.from("key_deletion_history").insert(historyRow);
+  if(historyError){showToast("Không thể lưu lịch sử xóa: "+historyError.message,"",true);return}
+  const {error}=await db.from("keys").delete().eq("id",id);
+  if(error){showToast("Không thể xóa Key: "+error.message,"",true);return}
+  await renderKeys();await renderKeyHistory();showToast("Đã xóa Key và lưu lịch sử.")}
+
+function getDeviceName(){
+  const ua=navigator.userAgent||"";
+  const models={"SM-A047F":"Samsung A04s","SM-A045F":"Samsung A04s","SM-A042F":"Samsung A04","SM-A045M":"Samsung A04s","SM-A047M":"Samsung A04s"};
+  for(const m in models)if(ua.includes(m))return models[m];
+  if(/Android/i.test(ua)){const hit=ua.match(/Android[^;)]*;\s*(?:[a-z]{2}-[A-Z]{2};\s*)?([^;)]+?)(?:\s+Build[\s/]?[^;)]+)?[;)]/i);if(hit&&hit[1])return hit[1].trim()}
+  if(/iPhone/i.test(ua))return "iPhone";
+  if(/iPad/i.test(ua))return "iPad";
+  if(/Windows/i.test(ua))return "Windows PC";
+  if(/Macintosh/i.test(ua))return "Mac";
+  return "Thiết bị không xác định";
+}
+
+function toggleKeyHistory(){
+  const body=$("keyHistoryBody");const collapsed=!body.classList.contains("hidden");body.classList.toggle("hidden",collapsed);$("keyHistoryToggle").textContent=collapsed?"Mở rộng ▼":"Thu gọn ▲";
+}
+
+async function renderKeyHistory(){
+  const box=$("keyHistory");if(!box)return;box.innerHTML="<p class='muted'>Đang tải lịch sử...</p>";
+  const {data,error}=await db.from("key_deletion_history").select("*").order("deleted_at",{ascending:false}).limit(500);
+  if(error){box.innerHTML="<p class='muted'>Không tải được lịch sử. Hãy chạy SQL bổ sung.</p>";return}
+  const q=$("keyHistorySearch").value.trim().toLowerCase();
+  const filtered=(data||[]).filter(x=>!q||[x.key,x.reason,x.deleted_by,x.device].some(v=>String(v||"").toLowerCase().includes(q)));
+  box.innerHTML=filtered.length?filtered.map(x=>`<div class="key-item"><div><span class="key-code">🗑️ ${esc(x.key)}</span><br><small>${esc(x.reason||"Đã xóa")} • ${esc(x.used_count??0)}/${esc(x.max_uses??0)} lượt</small><br><small>👤 ${esc(x.deleted_by||"Hệ thống")} • 📱 ${esc(x.device||"Không xác định")}</small><br><small>🕒 ${esc(x.deleted_at?new Date(x.deleted_at).toLocaleString("vi-VN"):"Không rõ")}</small></div></div>`).join(""):"<p class='muted'>Chưa có Key nào được lưu trong lịch sử.</p>";
+}
+
+function parseDuration(text){
+  text=text.toLowerCase().trim().replace(/,/g," ");
+  let total=0,m;
+  const units={giay:1000,giây:1000,phut:60000,phút:60000,gio:3600000,giờ:3600000,ngay:86400000,ngày:86400000,tuan:604800000,tuần:604800000,thang:2592000000,tháng:2592000000,nam:31536000000,năm:31536000000};
+  const re=/(\d+(?:[.,]\d+)?)\s*(giây|giay|phút|phut|giờ|gio|ngày|ngay|tuần|tuan|tháng|thang|năm|nam)/g;
+  while((m=re.exec(text)))total+=parseFloat(m[1].replace(",","."))*units[m[2]];
+  return total>0?Math.round(total):0;
+}
+async function findUserByEmail(){
+  const email=$("banEmail").value.trim().toLowerCase();
+  if(!email){showToast("Nhập email User.","",true);return null}
+  const {data,error}=await db.from("profiles").select("id,username,email,banned_until,ban_note").eq("email",email).maybeSingle();
+  if(error){showToast("Không tìm được User: "+error.message,"",true);return null}
+  if(!data){showToast("Không tìm thấy User với email này.","",true);return null}
+  return data;
+}
+async function banUser(){
+  const u=await findUserByEmail();if(!u)return;
+  const ms=parseDuration($("banDuration").value);
+  if(!ms){showToast("Thời gian không hợp lệ. Ví dụ: 1 giờ 5 phút.","",true);return}
+  const until=new Date(Date.now()+ms).toISOString();
+  const note=$("banNote").value.trim();
+  const {error}=await db.from("profiles").update({banned_until:until,ban_note:note}).eq("id",u.id);
+  if(error){showToast("Ban thất bại: "+error.message,"",true);return}
+  $("banResult").innerHTML=`<div class="user-result">👤 <b>${esc(u.username)}</b><br>📧 ${esc(u.email)}<br>🚫 Bị khóa đến: <b>${esc(new Date(until).toLocaleString("vi-VN"))}</b>${note?`<br>📝 ${esc(note)}`:""}<div class="actions"><button class="danger" onclick="unbanUser()">♻️ Unban</button></div></div>`;
+  showToast("Đã Ban User!",u.email);
+}
+async function unbanUser(){
+  const u=await findUserByEmail();if(!u)return;
+  const {error}=await db.from("profiles").update({banned_until:null,ban_note:null}).eq("id",u.id);
+  if(error){showToast("Unban thất bại: "+error.message,"",true);return}
+  $("banResult").innerHTML=`<div class="user-result">✅ <b>${esc(u.username)}</b> đã được Unban.</div>`;
+  showToast("Đã Unban User!",u.email);
+}
+
+async function saveCurrentKey(){
+  if(!currentUser)return;
+  const key=$("orderKey").value.trim().toUpperCase();
+  if(!key){showToast("Nhập Key trước khi lưu.","",true);return}
+  const {error}=await db.from("saved_keys").insert({user_id:currentUser.id,key});
+  if(error){showToast(error.code==="23505"?"Key này đã được lưu.":"Không thể lưu Key: "+error.message,"",true);return}
+  showToast("Đã lưu Key!");loadSavedKeys();
+}
+async function loadSavedKeys(){
+  if(!currentUser)return;
+  const box=$("savedKeys");box.classList.remove("hidden");box.innerHTML="<p class='muted'>Đang tải...</p>";
+  const {data,error}=await db.from("saved_keys").select("id,key").eq("user_id",currentUser.id).order("created_at",{ascending:false});
+  if(error){box.innerHTML="<p class='muted'>Không tải được Key đã lưu.</p>";return}
+  box.innerHTML=data.length?data.map(k=>`<div class="saved-key"><code>${esc(k.key)}</code><div class="actions"><button type="button" class="ghost" onclick="useSavedKey('${esc(k.key)}')">Dùng</button><button type="button" onclick="deleteSavedKey(${k.id})">Xóa</button></div></div>`).join(""):"<p class='muted'>Chưa có Key đã lưu.</p>";
+}
+function useSavedKey(key){$("orderKey").value=key;$("savedKeys").classList.add("hidden");showToast("Đã chọn Key đã lưu.")}
+async function deleteSavedKey(id){const {error}=await db.from("saved_keys").delete().eq("id",id);if(error){showToast("Không thể xóa Key đã lưu.","",true);return}loadSavedKeys()}
+
+$("newKeyPrefix").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();generateKeys()}});
+$("adminOrderSearch").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();searchAdminOrders()}});
+$("userOrderSearch").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();searchUserOrders()}});
+$("banEmail").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();banUser()}});
+$("keyHistorySearch").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();renderKeyHistory()}});
+
+async function loadPublicSiteSettings(){
+  const {data}=await db.from("site_settings").select("is_closed,message").eq("id",1).maybeSingle();
+  if(data){siteClosed=!!data.is_closed;siteMessage=data.message||siteMessage;applySiteState();}
+}
+async function loadSiteSettings(){
+  const {data,error}=await db.from("site_settings").select("is_closed,message").eq("id",1).maybeSingle();
+  if(error){showToast("Chưa có bảng site_settings. Hãy chạy SQL bổ sung.","",true);return}
+  if(data){siteClosed=!!data.is_closed;siteMessage=data.message||siteMessage;}
+  applySiteState();
+}
+function applySiteState(){
+  $("siteClosedBanner").classList.toggle("hidden",!siteClosed);
+  $("siteClosedMessage").textContent=siteMessage;
+  if($("siteClosedToggle")){ $("siteClosedToggle").checked=siteClosed; $("siteStatusText").textContent=siteClosed?"🔴 Website đang ĐÓNG":"🟢 Website đang MỞ"; $("siteClosedInput").value=siteMessage; }
+}
+async function setSiteClosed(value){
+  const {error}=await db.from("site_settings").upsert({id:1,is_closed:value,message:$("siteClosedInput").value.trim()||siteMessage,updated_at:new Date().toISOString()});
+  if(error){$("siteClosedToggle").checked=siteClosed;showToast("Không thể đổi trạng thái website: "+error.message,"",true);return}
+  siteClosed=value;siteMessage=$("siteClosedInput").value.trim()||siteMessage;applySiteState();showToast(value?"Đã đóng Website":"Đã mở Website");
+}
+async function saveSiteMessage(){
+  const message=$("siteClosedInput").value.trim()||"WEBSITE HIỆN TẠI ĐANG TẠM ĐÓNG VÌ QUÁ TẢI NGƯỜI DÙNG VÀ ĐẶT ĐƠN QUÁ NHIỀU";
+  const {error}=await db.from("site_settings").upsert({id:1,is_closed:siteClosed,message,updated_at:new Date().toISOString()});
+  if(error){showToast("Không lưu được thông báo: "+error.message,"",true);return}
+  siteMessage=message;applySiteState();showToast("Đã lưu thông báo đóng Website");
+}
+
+async function initUser(user){
+  currentUser=user;
+  const {data,error}=await db.from("profiles").select("username,role,email,banned_until").eq("id",user.id).single();
+  if(error){showAuth("login");msg("authMsg","Không đọc được hồ sơ tài khoản.","err");return}
+  currentProfile=data;
+  // Lưu thiết bị gần nhất để lịch sử Key tự động có thể ghi nhận thiết bị.
+  // Đây là nhận diện tương đối từ trình duyệt, không phải định danh phần cứng.
+  try{await db.from("profiles").update({last_device:getDeviceName()}).eq("id",user.id)}catch(e){}
+  const banned=data.banned_until && new Date(data.banned_until)>new Date();
+  if(banned){
+    await db.auth.signOut();
+    currentUser=null;currentProfile=null;
+    showAuth("login");
+    msg("authMsg","🚫 Tài khoản đang bị khóa đến "+new Date(data.banned_until).toLocaleString("vi-VN"),"err");
+    return;
+  }
+  $("email").value=user.email||data.email||"";
+  openPage(data.role==="admin"?"admin":"customer");
+}
+async function logout(){await db.auth.signOut();currentUser=null;currentProfile=null;openAuth()}
+function openAuth(){$("customerPage").classList.add("hidden");$("adminPage").classList.add("hidden");$("authPage").classList.remove("hidden");showAuth("login")}
+loadPublicSiteSettings();
+db.auth.onAuthStateChange((event,session)=>{setTimeout(()=>{if(session)initUser(session.user);else openAuth()},0)});
+db.auth.getSession().then(({data})=>{if(data.session)initUser(data.session.user)});
+</script>
+</body>
+</html>
